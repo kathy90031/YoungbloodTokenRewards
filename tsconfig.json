@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "sourceMap": true,
+    "rootDir": "./src",
     "lib": [
       "es5",
       "es2015.promise"
