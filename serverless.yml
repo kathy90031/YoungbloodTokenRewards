@@ -4,12 +4,11 @@ service:
 # Add the serverless-webpack plugin
 plugins:
   - serverless-webpack
-  - serverless-alexa-skills
 provider:
   name: aws
   runtime: nodejs6.10
   environment:
-      DYNAMODB_TABLE_TOKEN: Tokens-${opt:stage, self:provider.stage}
+      DYNAMODB_TABLE_TOKEN: Token-${opt:stage, self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -28,13 +27,11 @@ functions:
       - http:
           method: get
           path: hello
-  createToken:
-    handler: src/typescript/database/createToken.create
+
+  alexaToken:
+    handler: src/typescript/alexaSkill/alexaToken.invokeTokenReward
     events:
-      - http:
-          path: token
-          method: post
-          cors: true
+      - alexaSkill
 
 
 resources:
@@ -45,19 +42,13 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: id
+            AttributeName: childName
             AttributeType: S
         KeySchema:
           -
-            AttributeName: id
+            AttributeName: childName
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMODB_TABLE_TOKEN}
-
-custom:
-  alexa:
-    vendorId: M1B7YGHR414YSA
-    clientId: amzn1.application-oa2-client.28864766149d4e1f93689a0805738fcd
-    clientSecret: 6402f77cf0c6fceee4214c57e831bdb48bd8e8c92a0bbe82f9a12e987401fa56
