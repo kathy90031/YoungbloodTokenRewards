@@ -89,7 +89,7 @@ function onIntent(intentRequest, session, callback) {
     if (intentName === 'receiveTokens') {
         receiveTokens(intent, session, callback);
     } else if (intentName === 'getTokenCount') {
-        getWelcomeResponse(callback);
+        getTokenCount(intent, session, callback);
     } else if (intentName === 'AMAZON.HelpIntent') {
         getWelcomeResponse(callback);
     } else if (intentName === 'AMAZON.StopIntent' || intentName === 'AMAZON.CancelIntent') {
@@ -119,7 +119,7 @@ function receiveTokens(intent, session, callback) {
         let childName = childSlot.value;
         let tokenCount = tokenSlot.value;
         let tokenInfo = createTokenInfo(childName, tokenCount);
-        invokeGetTokenCount(tokenInfo);
+        invokeReceiveTokens(tokenInfo);
         sessionAttributes = createTokenAttributes(childName);
         speechOutput = `${childName} received ${tokenCount} tokens`;
         repromptText = "";
@@ -171,7 +171,14 @@ function createTokenInfo(childName,tokenCount){
     return tokenInfo;
 }
 
+function invokeReceiveTokens(tokenInfo){
+    let tokenCount = invokeGetTokenCount(tokenInfo);
 
+    tokenCount = tokenInfo.tokenCount + tokenCount;
+
+    let receiveTokenService = new CreateToken(tokenInfo);
+    receiveTokenService.execute();
+}
 
 function invokeGetTokenCount(tokenInfo){
 

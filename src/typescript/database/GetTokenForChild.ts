@@ -33,7 +33,7 @@ export class GetTokenForChild {
         this.params['Key']['childName'] = tokenInfo.childName;
     }
 
-    execute() {
+    execute(): number {
         console.log('here in get');
         let tokenCount = 0;
         // write the pet to the database
@@ -50,12 +50,13 @@ export class GetTokenForChild {
             console.log('result ');
             console.log(result.Item);
             let returnedCount = result.Item['tokenCount'];
-            this.tokenInfo.tokenCount = this.tokenInfo.tokenCount + returnedCount;
-            let createToken = new CreateToken(this.tokenInfo);
-            createToken.execute();
+            // this.tokenInfo.tokenCount = this.tokenInfo.tokenCount + returnedCount;
+            // let createToken = new CreateToken(this.tokenInfo);
+            // createToken.execute();
+            this.tokenCount = returnedCount;
 
         });
-
+        return this.tokenCount;
     }
 
 
