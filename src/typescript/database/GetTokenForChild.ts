@@ -8,22 +8,12 @@ export class GetTokenForChild {
     private dynamoDb = new this.AWS.DynamoDB.DocumentClient();
     private timestamp = new Date().getTime();
 
-    private _tokenCount: number;
-    get tokenCount(): number {
-        return this._tokenCount;
-    }
-
-    set tokenCount(value: number) {
-        this._tokenCount = value;
-    }
-
     private params = {
         TableName: process.env.DYNAMODB_TABLE_TOKEN,
         Key: {
             childName: '',
         },
     };
-
 
     private tokenInfo: TokenInfo;
 
@@ -33,12 +23,9 @@ export class GetTokenForChild {
         this.params['Key']['childName'] = tokenInfo.childName;
     }
 
-    execute(): number {
-        console.log('here in get');
-        let tokenCount = 0;
-        // write the pet to the database
-        console.log('params: ');
-        console.log(JSON.stringify(this.params));
+    execute(cb) {
+        console.log('here in get with callback ');
+
         this.dynamoDb.get(this.params, (error, result) => {
             // handle potential errors
             if (error) {
@@ -47,17 +34,17 @@ export class GetTokenForChild {
                 return;
             }
 
-            console.log('result ');
+            console.log('result 2 ');
             console.log(result.Item);
-            let returnedCount = result.Item['tokenCount'];
-            // this.tokenInfo.tokenCount = this.tokenInfo.tokenCount + returnedCount;
-            // let createToken = new CreateToken(this.tokenInfo);
-            // createToken.execute();
-            this.tokenCount = returnedCount;
+            let returnedCount = result.Item['token'];
+            console.log('RETURNED COUNT: '+ returnedCount);
 
+            return cb(returnedCount);
         });
-        return this.tokenCount;
+
     }
+
+
 
 
 }

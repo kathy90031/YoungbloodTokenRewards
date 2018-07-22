@@ -43,7 +43,7 @@ function getWelcomeResponse(callback) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     const sessionAttributes = {};
     const cardTitle = 'Welcome';
-    const speechOutput = 'Welcome Youngbloods.  I hope someone is recieving tokens today'
+    const speechOutput = 'Welcome Youngbloods.';
     const repromptText = 'To give tokens say Give Gabriel 5 tokens.';
     const shouldEndSession = false;
 
@@ -132,7 +132,7 @@ function receiveTokens(intent, session, callback) {
         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
-function getTokenCount(intent, session, callback) {
+async function getTokenCount(intent, session, callback) {
     const cardTitle = intent.name;
     const childSlot = intent.slots.child;
 
@@ -145,7 +145,7 @@ function getTokenCount(intent, session, callback) {
     if (childSlot) {
         let childName = childSlot.value;
         let tokenInfo = createTokenInfo(childName,'');
-        let tokenCount = invokeGetTokenCount(tokenInfo);
+        let tokenCount = await invokeGetTokenCount(tokenInfo);
         sessionAttributes = createTokenAttributes(childName);
         speechOutput = `${childName} has ${tokenCount} tokens`;
         repromptText = "";
@@ -180,16 +180,43 @@ function invokeReceiveTokens(tokenInfo){
     receiveTokenService.execute();
 }
 
-function invokeGetTokenCount(tokenInfo){
+async function invokeGetTokenCount(tokenInfo){
 
-    let getChild = new GetTokenForChild(tokenInfo);
+    const uuid = require('uuid');
+    const AWS = require('aws-sdk');
+    const dynamoDb = new AWS.DynamoDB.DocumentClient();
+    const timestamp = new Date().getTime();
+    const params = {
+        TableName: process.env.DYNAMODB_TABLE_TOKEN,
+        Key: {
+            childName: tokenInfo.childName,
+        },
+    };
 
-    getChild.execute();
+    let tokenCount = await dynamoDb.get(params, (error, result) => {
+        // handle potential errors
+        if (error) {
+            console.error(error);
 
+            return;
+        }
 
-    console.log('tokenCount: ' + getChild.tokenCount);
-    return getChild.tokenCount;
+        console.log('result 2 ');
+        console.log(result.Item);
+        let returnedCount = result.Item['token'];
+        console.log('RETURNED COUNT: '+ returnedCount);
+
+        new Promise((resolve, reject) => {
+            setTimeout(() => reject('woops'), 500);
+            return resolve(returnedCount);
+        });
+    });
+
+    console.log('token count from dynamobd await ' + typeof tokenCount);
+    return tokenCount;
+
 }
+
 
 
 
@@ -207,7 +234,7 @@ function handleSessionEndRequest(callback) {
 
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
-export const invokeTokenReward: Handler = (event, context, callback) => {
+export const invokeTokenRewards: Handler = (event, context, callback) => {
 
 
     if (event.session.new) {
