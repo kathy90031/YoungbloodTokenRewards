@@ -90,6 +90,11 @@ function onIntent(intentRequest, session, callback) {
         receiveTokens(intent, session, callback);
     } else if (intentName === 'getTokenCount') {
         getTokenCount(intent, session, callback);
+    } else if (intentName === 'loseTokens') {
+        loseTokens(intent, session, callback);
+    } else if (intentName === 'resetTokens') {
+        console.log('calling intent resetTokens');
+        resetTokens(intent, session, callback);
     } else if (intentName === 'AMAZON.HelpIntent') {
         getWelcomeResponse(callback);
     } else if (intentName === 'AMAZON.StopIntent' || intentName === 'AMAZON.CancelIntent') {
@@ -122,6 +127,59 @@ function receiveTokens(intent, session, callback) {
         invokeReceiveTokens(tokenInfo);
         sessionAttributes = createTokenAttributes(childName);
         speechOutput = `${childName} received ${tokenCount} tokens`;
+        repromptText = "";
+    } else {
+        speechOutput = "There was a problem. Please try again.";
+        repromptText = "";
+    }
+
+    callback(sessionAttributes,
+        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
+function loseTokens(intent, session, callback) {
+    const cardTitle = intent.name;
+    const childSlot = intent.slots.child;
+    const tokenSlot = intent.slots.tokenCount;
+
+    let repromptText = '';
+    let sessionAttributes = {};
+    const shouldEndSession = false;
+    let speechOutput = '';
+
+    if (childSlot && tokenSlot) {
+        let childName = childSlot.value;
+        let tokenCount = tokenSlot.value;
+        let tokenInfo = createTokenInfo(childName, tokenCount);
+        invokeTakeAwayTokens(tokenInfo);
+        sessionAttributes = createTokenAttributes(childName);
+        speechOutput = `${childName} lost ${tokenCount} tokens`;
+        repromptText = "";
+    } else {
+        speechOutput = "There was a problem. Please try again.";
+        repromptText = "";
+    }
+
+    callback(sessionAttributes,
+        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
+function resetTokens(intent, session, callback) {
+    const cardTitle = intent.name;
+    const childSlot = intent.slots.child;
+
+    console.log('resetTokens intent');
+    let repromptText = '';
+    let sessionAttributes = {};
+    const shouldEndSession = false;
+    let speechOutput = '';
+
+    if (childSlot) {
+        let childName = childSlot.value;
+        let tokenInfo = createTokenInfo(childName, '0');
+        invokeResetTokens(tokenInfo);
+        sessionAttributes = createTokenAttributes(childName);
+        speechOutput = `${childName} has 0 tokens.`;
         repromptText = "";
     } else {
         speechOutput = "There was a problem. Please try again.";
@@ -171,11 +229,37 @@ function createTokenInfo(childName,tokenCount){
     return tokenInfo;
 }
 
-function invokeReceiveTokens(tokenInfo){
-    let tokenCount = invokeGetTokenCount(tokenInfo);
+async function invokeReceiveTokens(tokenInfo){
+    let tokenCount = await invokeGetTokenCount(tokenInfo);
+    let tokenCountInt = parseInt(tokenCount);
+    let recievedTokenCountInt = parseInt(tokenInfo.tokenCount);
+    let totalTokens = tokenCountInt + recievedTokenCountInt;
+    console.log('give tokens: ' + totalTokens);
 
-    tokenCount = tokenInfo.tokenCount + tokenCount;
+    tokenInfo.tokenCount = totalTokens;
+    console.log('give tokensInfo.tokenCount: ' + tokenInfo.tokenCount);
+    let receiveTokenService = new CreateToken(tokenInfo);
+    receiveTokenService.execute();
+}
 
+async function invokeTakeAwayTokens(tokenInfo){
+    console.log('in take away tokens ');
+    let tokenCount = await invokeGetTokenCount(tokenInfo);
+    let tokenCountInt = parseInt(tokenCount);
+    let recievedTokenCountInt = parseInt(tokenInfo.tokenCount);
+    let totalTokens = tokenCountInt - recievedTokenCountInt;
+    console.log('take away tokens: ' + totalTokens);
+
+    tokenInfo.tokenCount = totalTokens;
+    console.log('take away tokensInfo.tokenCount: ' + tokenInfo.tokenCount);
+    let receiveTokenService = new CreateToken(tokenInfo);
+    receiveTokenService.execute();
+}
+
+async function invokeResetTokens(tokenInfo){
+    console.log('inside reset tokens '
+        + tokenInfo.childName + ' - '
+        + tokenInfo.tokenCount);
     let receiveTokenService = new CreateToken(tokenInfo);
     receiveTokenService.execute();
 }
@@ -193,27 +277,14 @@ async function invokeGetTokenCount(tokenInfo){
         },
     };
 
-    let tokenCount = await dynamoDb.get(params, (error, result) => {
-        // handle potential errors
-        if (error) {
-            console.error(error);
+    let tokenPromise = await dynamoDb.get(params).promise().then(function(result){
 
-            return;
-        }
-
-        console.log('result 2 ');
-        console.log(result.Item);
-        let returnedCount = result.Item['token'];
-        console.log('RETURNED COUNT: '+ returnedCount);
-
-        new Promise((resolve, reject) => {
-            setTimeout(() => reject('woops'), 500);
-            return resolve(returnedCount);
-        });
+        return result.Item['token'];
     });
 
-    console.log('token count from dynamobd await ' + typeof tokenCount);
-    return tokenCount;
+    console.log('tokenPromise returned' + tokenPromise);
+
+    return tokenPromise;
 
 }
 
