@@ -43,7 +43,7 @@ function getWelcomeResponse(callback) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     const sessionAttributes = {};
     const cardTitle = 'Welcome';
-    const speechOutput = 'Welcome Youngbloods.';
+    const speechOutput = 'Welcome Youngbloods.  I hope someone is receiving tokens this beautiful day.';
     const repromptText = 'To give tokens say Give Gabriel 5 tokens.';
     const shouldEndSession = false;
 
