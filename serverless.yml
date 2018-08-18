@@ -25,6 +25,12 @@ functions:
     handler: src/typescript/alexaSkill/alexaToken.invokeTokenRewards
     events:
       - alexaSkill
+  token:
+    handler: src/typescript/rest/handler.invokeTokenRewards
+    events:
+      - http:
+          method: get
+          path: tokenrewards
 
 
 resources:

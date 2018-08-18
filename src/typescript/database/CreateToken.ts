@@ -26,14 +26,11 @@ export class CreateToken {
     }
 
     execute(): void {
-        console.log('here in put');
         if (!this.tokenInfo.childName || !this.tokenInfo.tokenCount) {
             console.error('Validation Failed');
             return;
         }
-        // write the pet to the database
-        console.log('params: ');
-        console.log(JSON.stringify(this.params));
+
         this.dynamoDb.put(this.params, (error) => {
             // handle potential errors
             if (error) {
@@ -47,7 +44,6 @@ export class CreateToken {
                 body: JSON.stringify(this.params.Item),
             };
         });
-
 
     }
 

@@ -4,3 +4,10 @@ jspm_packages
 
 # Serverless directories
 .serverless
+.idea/YoungbloodTokenRewards.iml
+.idea/workspace.xml
+.idea/workspace (DESKTOP-A6MTM32's conflicted copy 2018-07-15).xml
+.idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/typescript-compiler.xml
