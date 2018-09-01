@@ -11,3 +11,7 @@ jspm_packages
 .idea/modules.xml
 .idea/misc.xml
 .idea/typescript-compiler.xml
+src/typescript/database/GetTokenForChild.js.map
+src/typescript/database/CreateToken.js.map
+src/typescript/alexaSkill/alexaToken.js.map
+src/domain/TokenInfo.js.map
