@@ -15,3 +15,8 @@ src/typescript/database/GetTokenForChild.js.map
 src/typescript/database/CreateToken.js.map
 src/typescript/alexaSkill/alexaToken.js.map
 src/domain/TokenInfo.js.map
+.idea/encodings.xml
+.webpack/service/src/typescript/rest/handler.js.map
+.webpack/service/src/typescript/rest/handler.js
+.webpack/service/src/typescript/alexaSkill/alexaToken.js.map
+.webpack/service/src/typescript/alexaSkill/alexaToken.js
