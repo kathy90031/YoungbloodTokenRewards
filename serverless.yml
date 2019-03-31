@@ -30,12 +30,18 @@ functions:
     handler: src/typescript/alexaSkill/alexaToken.invokeTokenRewards
     events:
       - alexaSkill
-  token:
+  getToken:
     handler: src/typescript/handler.getTokenService
     events:
       - http:
           method: get
           path: tokenrewards
+  postToken:
+    handler: src/typescript/handler.updateTokenService
+    events:
+      - http:
+          method: post
+          path: updatetokenrewards
 
 resources:
   Resources:
