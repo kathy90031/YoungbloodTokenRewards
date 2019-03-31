@@ -1,12 +1,13 @@
-import {TokenInfo} from "../../domain/TokenInfo";
-import {CreateToken} from "./CreateToken";
-
 
 export class GetTokenForChild {
-    private uuid = require('uuid');
     private AWS = require('aws-sdk');
-    private dynamoDb = new this.AWS.DynamoDB.DocumentClient();
-    private timestamp = new Date().getTime();
+
+    private options = {
+        region: 'localhost',
+        endpoint: 'http://localhost:8000',
+    };
+
+    private dynamoDb = new this.AWS.DynamoDB.DocumentClient(this.options);
 
     private params = {
         TableName: process.env.DYNAMODB_TABLE_TOKEN,
@@ -15,36 +16,20 @@ export class GetTokenForChild {
         },
     };
 
-    private tokenInfo: TokenInfo;
-
-
-    constructor(tokenInfo: TokenInfo) {
-        this.tokenInfo = tokenInfo;
-        this.params['Key']['childName'] = tokenInfo.childName;
-    }
-
-    execute(cb) {
-        console.log('here in get with callback ');
-
-        this.dynamoDb.get(this.params, (error, result) => {
-            // handle potential errors
-            if (error) {
-                console.error(error);
-
-                return;
-            }
-
-            console.log('result 2 ');
-            console.log(result.Item);
-            let returnedCount = result.Item['token'];
-            console.log('RETURNED COUNT: '+ returnedCount);
-
-            return cb(returnedCount);
+    async execute(childName: string) {
+        console.log('in execute 12:');
+        this.params.Key.childName = childName;
+        console.log(JSON.stringify(this.params));
+        let tokenPromise = await this.dynamoDb
+            .get(this.params)
+            .promise()
+            .then(function(result){
+            return result.Item['token'];
         });
 
+        console.log('tokenPromise returned' + tokenPromise);
+
+        return tokenPromise;
     }
-
-
-
 
 }

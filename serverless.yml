@@ -12,6 +12,7 @@ provider:
   runtime: nodejs6.10
   environment:
       DYNAMODB_TABLE_TOKEN: Tokens-${opt:stage, self:provider.stage}
+      IS_OFFLINE: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -21,7 +22,8 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:*"
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:*'
+
 
 functions:
   alexaToken:
@@ -29,7 +31,7 @@ functions:
     events:
       - alexaSkill
   token:
-    handler: src/typescript/rest/handler.invokeTokenRewards
+    handler: src/typescript/handler.getTokenService
     events:
       - http:
           method: get
@@ -53,3 +55,23 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMODB_TABLE_TOKEN}
+custom:
+  dynamodb:
+    # If you only want to use DynamoDB Local in some stages, declare them here
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    seed:
+      domain:
+        sources:
+          - table: ${self:provider.environment.DYNAMODB_TABLE_TOKEN}
+            sources: [./seed.json]
+    # Uncomment only if you already have a DynamoDB running locally
+    # noStart: true
