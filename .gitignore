@@ -20,3 +20,4 @@ src/domain/TokenInfo.js.map
 .webpack/service/src/typescript/rest/handler.js
 .webpack/service/src/typescript/alexaSkill/alexaToken.js.map
 .webpack/service/src/typescript/alexaSkill/alexaToken.js
+.webpack/
