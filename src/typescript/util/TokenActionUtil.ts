@@ -1,5 +1,5 @@
 
-import {TokenActionType} from "../type/TokenAction";
+import {TokenActionType} from "../type/TokenActionType";
 
 export class TokenActionUtil {
 
