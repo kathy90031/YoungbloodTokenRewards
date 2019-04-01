@@ -306,7 +306,9 @@ function handleSessionEndRequest(callback) {
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
 export const invokeTokenRewards: Handler = (event, context, callback) => {
-
+    console.log('EVENT 3 = ' + JSON.stringify(event));
+    console.log('CONTEXT = ' + JSON.stringify(context));
+    console.log('CALLBACK = ' + JSON.stringify(callback));
 
     if (event.session.new) {
         onSessionStarted({ requestId: event.request.requestId }, event.session);
@@ -328,5 +330,7 @@ export const invokeTokenRewards: Handler = (event, context, callback) => {
         onSessionEnded(event.request, event.session);
         callback();
     }
+
+
 }
 
