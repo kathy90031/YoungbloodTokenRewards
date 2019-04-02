@@ -8,13 +8,14 @@
     "start": "serverless offline start --stage dev"
   },
   "dependencies": {
-    "aws-sdk": "^2.418.0",
-    "source-map-support": "^0.5.10",
+    "ask-sdk": "^2.5.1",
+    "aws-sdk": "^2.433.0",
+    "source-map-support": "^0.5.11",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/aws-lambda": "0.0.22",
-    "@types/node": "^8.10.43",
+    "@types/node": "^8.10.45",
     "serverless-alexa-skills": "0.0.6",
     "serverless-dynamodb-local": "0.2.30",
     "serverless-offline": "^3.33.0",

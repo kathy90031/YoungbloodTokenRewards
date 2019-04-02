@@ -1,45 +1,42 @@
+import {AlexaIntentNameType} from "../type/AlexaIntentNameType";
+
 export class SpeechResponseHandler {
-    // --------------- Helpers that build all of the responses -----------------------
 
-    buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
-        return {
-            outputSpeech: {
-                type: 'PlainText',
-                text: output,
-            },
-            card: {
-                type: 'Simple',
-                title: `SessionSpeechlet - ${title}`,
-                content: `SessionSpeechlet - ${output}`,
-            },
-            reprompt: {
-                outputSpeech: {
-                    type: 'PlainText',
-                    text: repromptText,
-                },
-            },
-            shouldEndSession,
-        };
+    getInvalidChildResponse(childName: string) {
+        return `There isn't any child named ${childName} in the family. Please use either Gabriel or Jackson`;
     }
 
-    buildResponse(sessionAttributes, speechletResponse) {
-        return {
-            version: '1.0',
-            sessionAttributes,
-            response: speechletResponse,
-        };
+    getValidChildResponse(childName: string, tokenCount: any, action: string): string {
+        let tokenWord = '';
+        if (tokenCount === 1){
+            tokenWord = 'token ';
+        } else {
+            tokenWord = 'tokens';
+        }
+        let verb = '';
+        switch (action){
+            case AlexaIntentNameType.GET_TOKENS:
+                verb = 'has';
+                break;
+            case AlexaIntentNameType.GIVE_TOKENS:
+                verb = 'received';
+                break;
+            case AlexaIntentNameType.RESET_TOKENS:
+                verb = 'has been reset to';
+                break;
+            case AlexaIntentNameType.LOSE_TOKENS:
+                verb = 'lost';
+                break;
+            default:
+                verb = 'has';
+                break;
+        }
+        return `${childName} ${verb} ${tokenCount} ${tokenWord}`;
     }
 
-    getWelcomeResponse(callback) {
-        // If we wanted to initialize the session to have some attributes we could add those here.
-        const sessionAttributes = {};
-        const cardTitle = 'Welcome';
-        const speechOutput = 'Welcome Youngbloods.';
-        const repromptText = 'To give tokens say Give Gabriel 5 tokens.';
-        const shouldEndSession = false;
-
-        callback(sessionAttributes,
-            this.buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+    getRepromptResponse() {
+        return 'Do you need anything else?';
     }
+
 
 }

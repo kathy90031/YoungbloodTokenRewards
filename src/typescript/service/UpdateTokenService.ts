@@ -1,8 +1,9 @@
 import {GetTokenForChild} from "../database/GetTokenForChild";
 import {ChildValidationUtil} from "../util/ChildValidationUtil";
-import {ResponseHandler} from "../handler/ResponseHandler";
+import {SpeechResponseHandler} from "../handler/SpeechResponseHandler";
 import {TokenActionUtil} from "../util/TokenActionUtil";
 import {UpdateTokenForChild} from "../database/UpdateTokenForChild";
+import {AlexaIntentNameType} from "../type/AlexaIntentNameType";
 
 export const updateTokenService = async (event: any, context: any, callback: any) => {
     let body = JSON.parse(event.body);
@@ -11,22 +12,24 @@ export const updateTokenService = async (event: any, context: any, callback: any
     let action = body.action;
 
     let response: any;
-    let responseHandler = new ResponseHandler();
+    let responseHandler = new SpeechResponseHandler();
 
     let isValid = ChildValidationUtil.isChildValid(childName);
-
+    let count: number;
+    let responseCount: any;
     if (isValid){
         let tokenForChild = new GetTokenForChild();
         let updateTokensForChild = new UpdateTokenForChild();
 
-        let count = await tokenForChild.execute(childName);
+        responseCount = await tokenForChild.execute(childName);
+        count = parseInt(responseCount);
         let totalTokens = TokenActionUtil
-            .calculateTokensForAction(action,parseInt(count),parseInt(tokens));
+            .calculateTokensForAction(action,count,parseInt(tokens));
 
         updateTokensForChild.execute(childName,totalTokens);
-        response = responseHandler.getValidChildResponse(childName, totalTokens);
+        response = responseHandler.getValidChildResponse(childName, totalTokens, action);
     } else {
-        response = responseHandler.getInvalidChildResponse();
+        response = responseHandler.getInvalidChildResponse(childName);
     }
 
 

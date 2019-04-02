@@ -1,49 +1,33 @@
 'use strict';
-import { Handler } from 'aws-lambda';
-import {AlexaSessionHandler} from "../handler/AlexaSessionHandler";
-import {AlexaEventType} from "../type/AlexaEventType";
-import {IntentHandler} from "../intent/IntentHandler";
-import {CallbackHandler} from "../handler/CallbackHandler";
-import {SpeechResponseHandler} from "../handler/SpeechResponseHandler";
-// --------------- Main handler -----------------------
+
+import {LambdaHandler} from "ask-sdk-core/dist/skill/factory/BaseSkillFactory";
+import {SkillBuilders} from "ask-sdk";
+import {CancelIntentHandler} from "../handler/CancelIntentHandler";
+import {AmazonStopIntentHandler} from "../handler/StopIntentHandler";
+import {LaunchRequestHandler} from "../handler/LaunchHandler";
+import {SessionEndedHandler} from "../handler/SessionEndedHandler";
+import {TokenErrorHandler} from "../handler/TokenErrorHandler";
+import {GetTokensHandler} from "../handler/GetTokensHandler";
+import {UpdateTokensHandler} from "../handler/UpdateTokensHandler";
+import {ResetTokensHandler} from "../handler/ResetTokensHandler";
 
 
-// Route the incoming request based on type (LaunchRequest, IntentRequest,
-// etc.) The JSON body of the request is provided in the event parameter.
-export const invokeTokenRewards: Handler = (event, context, callback) => {
+export const invokeTokenRewards = buildYoungbloodTokenSkill();
 
-    let alexaSessionHandler = new AlexaSessionHandler();
-    let intentHandler = new IntentHandler();
-    let callbackHandler = new CallbackHandler();
-    const sessionAttributes = {};
-    const speechletResponse = {};
-
-    if (event.session.new) {
-        alexaSessionHandler
-            .onSessionStarted({ requestId: event.request.requestId }, event.session);
-
-    }
-
-    switch (event.request.type){
-        case AlexaEventType.LAUNCH_REQUEST:
-            alexaSessionHandler.onLaunch(event.request,
-                event.session,
-                callbackHandler.getAlexaCallback(sessionAttributes, speechletResponse, callback));
-            break;
-        case AlexaEventType.INTENT_REQUEST:
-            intentHandler.onIntent(event.request,
-                event.session,
-                callbackHandler.getAlexaCallback(sessionAttributes, speechletResponse, callback));
-
-            break;
-        case AlexaEventType.SESSION_ENDED:
-            alexaSessionHandler.onSessionEnded(event.request, event.session);
-            break;
-
-        default:
-            alexaSessionHandler.onSessionEnded(event.request, event.session);
-            break;
-    }
-
+function buildYoungbloodTokenSkill(): LambdaHandler {
+    return SkillBuilders.standard()
+        .addRequestHandlers(
+            new CancelIntentHandler,
+            new AmazonStopIntentHandler,
+            new LaunchRequestHandler,
+            new SessionEndedHandler,
+            new GetTokensHandler,
+            new UpdateTokensHandler,
+            new ResetTokensHandler
+        )
+        .addErrorHandlers(new TokenErrorHandler())
+        .lambda();
 }
+
+
 

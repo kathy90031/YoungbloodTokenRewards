@@ -28,6 +28,7 @@ provider:
 functions:
   alexaToken:
     handler: src/typescript/alexaSkill/alexaToken.invokeTokenRewards
+    timeout: 30
     events:
       - alexaSkill
   getToken:
@@ -42,6 +43,12 @@ functions:
       - http:
           method: post
           path: updatetokenrewards
+  postAlexaTestService:
+    handler: src/typescript/handler.alexaTestService
+    events:
+      - http:
+          method: post
+          path: alexaTest
 
 resources:
   Resources:
@@ -66,6 +73,7 @@ custom:
     # If you only want to use DynamoDB Local in some stages, declare them here
     stages:
       - dev
+      - temp
     start:
       port: 8000
       inMemory: true

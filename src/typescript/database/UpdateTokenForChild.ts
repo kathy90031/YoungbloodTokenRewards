@@ -2,12 +2,19 @@
 export class UpdateTokenForChild {
     private AWS = require('aws-sdk');
 
-    private options = {
-        region: 'localhost',
-        endpoint: 'http://localhost:8000',
-    };
+    constructor() {
+        console.log('is process offline after update?: ' + process.env.IS_OFFLINE);
+        let options = {};
+        // if (process.env.IS_OFFLINE) {
+        //     options = {
+        //         region: 'localhost',
+        //         endpoint: 'http://localhost:8000',
+        //     };
+        // }
+        this.dynamoDb = new this.AWS.DynamoDB.DocumentClient(options);
+    }
 
-    private dynamoDb = new this.AWS.DynamoDB.DocumentClient(this.options);
+    private dynamoDb: any;
 
     private params = {
         TableName: process.env.DYNAMODB_TABLE_TOKEN,
