@@ -10,11 +10,11 @@ export class LaunchRequestHandler implements RequestHandler {
 
     handle(handlerInput: HandlerInput): Response {
         const responseBuilder = handlerInput.responseBuilder;
-        const promptText = 'This is a test say hello!';
+        const promptText = 'Who are you giving tokens to today?';
         return responseBuilder
             .speak('Welcome Youngbloods!')
             .reprompt('')
-            .withSimpleCard('Hello World', promptText)
+            .withSimpleCard('Tokens', promptText)
             .getResponse();
     }
 }

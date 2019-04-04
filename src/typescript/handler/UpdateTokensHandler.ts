@@ -36,7 +36,7 @@ export class UpdateTokensHandler implements RequestHandler {
 
         let response: string;
 
-        if (isValid){
+        if (isValid && !Number.isNaN(tokens)){
             let tokenForChild = new GetTokenForChild();
             let updateTokensForChild = new UpdateTokenForChild();
 
@@ -49,9 +49,13 @@ export class UpdateTokensHandler implements RequestHandler {
             response = responseHandler.getValidChildResponse(childName, tokens, action);
             response = response + ' and now '
                 + responseHandler.getValidChildResponse(childName, totalTokens, AlexaIntentNameType.GET_TOKENS);
+        }  else if (Number.isNaN(tokens)) {
+            response = responseHandler.getInvalidTokenCount();
         } else {
+            console.log("isValid: " + isValid);
             response = responseHandler.getInvalidChildResponse(childName);
         }
+
 
         return responseBuilder
             .speak(response)

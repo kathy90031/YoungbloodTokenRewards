@@ -34,8 +34,12 @@ export class SpeechResponseHandler {
         return `${childName} ${verb} ${tokenCount} ${tokenWord}`;
     }
 
+    getInvalidTokenCount() {
+        return `Your response is not a valid token number. Please try again.`;
+    }
+
     getRepromptResponse() {
-        return 'Do you need anything else?';
+        return 'If you need anything else please speak the command or say cancel.';
     }
 
 

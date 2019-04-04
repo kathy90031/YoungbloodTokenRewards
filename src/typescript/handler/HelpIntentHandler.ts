@@ -13,7 +13,7 @@ export class HelpIntentHandler implements RequestHandler {
     handle(handlerInput: HandlerInput): Response {
         const responseBuilder = handlerInput.responseBuilder;
 
-        return responseBuilder.speak('welcome from typescript')
+        return responseBuilder.speak('No help is available at this time')
             .getResponse();
     }
 }

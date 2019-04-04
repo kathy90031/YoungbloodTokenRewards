@@ -13,7 +13,7 @@ export class AmazonStopIntentHandler implements RequestHandler {
     handle(handlerInput: HandlerInput): Response {
         const responseBuilder = handlerInput.responseBuilder;
 
-        return responseBuilder.speak('welcome from typescript')
+        return responseBuilder.speak('Stoppecd')
             .getResponse();
     }
 }
