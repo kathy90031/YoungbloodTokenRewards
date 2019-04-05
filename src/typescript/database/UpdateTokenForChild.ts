@@ -1,9 +1,6 @@
 
-export class GetTokenForChild {
+export class UpdateTokenForChild {
     private AWS = require('aws-sdk');
-
-
-
 
     constructor() {
         console.log('is process offline after update?: ' + process.env.IS_OFFLINE);
@@ -21,25 +18,23 @@ export class GetTokenForChild {
 
     private params = {
         TableName: process.env.DYNAMODB_TABLE_TOKEN,
-        Key: {
+        Item: {
             childName: '',
+            token: 0,
         },
     };
 
-    async execute(childName: string) {
-        console.log('in execute 12:');
-        this.params.Key.childName = childName;
-        console.log(JSON.stringify(this.params));
-        let tokenPromise = await this.dynamoDb
-            .get(this.params)
-            .promise()
-            .then(function(result){
-            return result.Item['token'];
+     execute(childName: string, tokenCount: number) {
+         this.params.Item.childName = childName;
+         this.params.Item.token = tokenCount;
+         this.dynamoDb.put(this.params, (error) => {
+            // handle potential errors
+            if (error) {
+                console.error(error);
+                return;
+            }
         });
 
-        console.log('tokenPromise returned' + tokenPromise);
-
-        return tokenPromise;
     }
 
 }
