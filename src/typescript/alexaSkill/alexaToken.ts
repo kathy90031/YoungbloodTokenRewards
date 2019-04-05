@@ -28,6 +28,3 @@ function buildYoungbloodTokenSkill(): LambdaHandler {
         .addErrorHandlers(new TokenErrorHandler())
         .lambda();
 }
-
-
-
